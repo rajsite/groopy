@@ -36,112 +36,116 @@ module.controller('AppCtrl', function ($scope, $ionicModal, $timeout) {
 module.controller('PlaylistsCtrl', function ($scope, $location) {
     $scope.cities = cities;
     $scope.loading = true;
-    
-    $scope.sortLocations = function(locations, lat, lng) {
-        var dist = function(l) {
+
+    $scope.sortLocations = function (locations, lat, lng) {
+        var dist = function (l) {
             var dist = (parseFloat(l.lat) - lat) * (parseFloat(l.lat) - lat) +
                 (parseFloat(l.lon) + lng) * (parseFloat(l.lon) + lng);
             return dist;
-        }
+        };
 
         locations.sort(function (l1, l2) {
             return dist(l1) - dist(l2);
         });
-    }
+    };
 
     $scope.locateUser = function () {
         // Cordova call
         $scope.loading = true;
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(function (position) {
             $scope.sortLocations($scope.cities, position.coords.latitude, position.coords.longitude);
             $scope.loading = false;
             $scope.$digest();
-            
-            var path = 'app/playlists/:' + $scope.cities[0].rank;
-            console.log(path);
-            $location.path(path);
         });
     };
-    
+
 });
 
-module.controller('PlaylistCtrl', function ($scope, $stateParams) {
+module.controller('PlaylistCtrl', function ($scope, $stateParams, $http) {
     $scope.playlistId = $stateParams.playlistId;
-    
-    $scope.cityName = function(rank) {
+    $scope.loading = true;
+
+    $scope.cityName = function (rank) {
         var i;
         for (i = 0; i < cities.length; i++) {
-            if (cities[i].rank == rank)
-            {
+            if (cities[i].rank == rank) {
                 return cities[i].name;
             }
         }
     };
-    console.log($stateParams);
-    
-    $scope.cardSwiped = function(index) {
-        
+
+    $scope.index = 0;
+    $scope.runningTotal = 0;
+
+    $scope.cardSwiped = function (index) {
+        $scope.index++;
+        $scope.runningTotal++;
+        if ($scope.index === $scope.cards.length) {
+            $scope.loadCards($scope.playlistId);
+            $scope.loading = true;
+        } else {
+            R.ready(function () {
+                R.player.pause();
+            });
+            $scope.playNext();
+        }
+    };
+
+    $scope.cardDestroyed = function (index) {
+    };
+
+    $scope.cards = [];
+    $scope.loadCards = function (rank) {
+        var cityName = $scope.cityName(rank);
+        $http.get('http://ec2-52-11-35-31.us-west-2.compute.amazonaws.com:3000/artists/' + cityName + '/playlist?start=' + $scope.runningTotal).
+        success(function (data) {
+            $scope.index = 0;
+            $scope.cards = data;
+            $scope.loading = false;
+            $scope.playNext();
+        }).error(function (data) {
+            // TODO
+        });
+    };
+
+    $scope.playNext = function () {
+
+        R.ready(function () {
+            R.logger.verbosity("all");
+            var source = $scope.cards[$scope.cards.length - $scope.index - 1].result[0];
+            R.player.play({
+                source: source.key
+            });
+            console.log('track name: ' + source.name);
+            R.player.on('change:playState', function (state) {
+                if (state === R.player.PLAYSTATE_STOPPED) {
+                    R.player.pause();
+                }
+                if (state === R.player.PLAYSTATE_OFFLINE) {
+                
+                }
+            });
+        });
     };
     
-    $scope.cardDestroyed = function() {};
-    
-    $scope.cards = artistData;
-//
-//$scope.cardDestroyed = function(index) {
-//  $scope.cards.splice(index, 1);
-//};
-//
-//$scope.cardSwiped = function(index) {
-//  var newCard = // new card data
-//  $scope.cards.push(newCard);
-//};
+    $scope.notPaused = true;
+    $scope.toggle = function() {
+        R.ready(function () {
+            R.player.togglePause();
+            $scope.notPaused = !$scope.notPaused;
+            $scope.$digest();
+        });
+    };
+    //
+    //$scope.cardDestroyed = function(index) {
+    //  $scope.cards.splice(index, 1);
+    //};
+    //
+    //$scope.cardSwiped = function(index) {
+    //  var newCard = // new card data
+    //  $scope.cards.push(newCard);
+    //};
 });
-
-var artistData = [
-	{
-    "status": "ok",
-    "result": [
-      {
-        "radioKey": "sr11580789",
-        "baseIcon": "album/9/8/6/00000000000f3689/square-200.jpg",
-        "canDownloadAlbumOnly": false,
-        "iframeUrl": "https://rd.io/i/Rl6j--gr4vQx/",
-        "radio": {
-          "type": "sr",
-          "key": "sr11580789"
-        },
-        "artistUrl": "/artist/Wilco/",
-        "duration": 436,
-        "album": "The Whole Love (Deluxe Edition)",
-        "isClean": false,
-        "albumUrl": "/artist/Wilco/album/The_Whole_Love_(Deluxe_Edition)/",
-        "shortUrl": "http://rd.io/x/Rl6j--gr4vQx/",
-        "albumArtist": "Wilco",
-        "canStream": true,
-        "embedUrl": "https://rd.io/e/Rl6j--gr4vQx/",
-        "type": "t",
-        "gridIcon": "http://rdiodynimages1-a.akamaihd.net/?l=a997001-0%3Aboxblur%2810%25%2C10%25%29%3Ba997001-0%3Aprimary%280.65%29%3B%240%3Aoverlay%28%241%29%3Ba997001-0%3Apad%2850%25%29%3B%242%3Aoverlay%28%243%29",
-        "price": null,
-        "trackNum": 1,
-        "albumArtistKey": "r85827",
-        "key": "t11580789",
-        "icon": "http://rdio1img-a.akamaihd.net/album/9/8/6/00000000000f3689/square-200.jpg",
-        "canSample": true,
-        "name": "Art Of Almost",
-        "isExplicit": false,
-        "artist": "Wilco",
-        "url": "/artist/Wilco/album/The_Whole_Love_(Deluxe_Edition)/track/Art_Of_Almost/",
-        "icon400": "http://rdio3img-a.akamaihd.net/album/9/8/6/00000000000f3689/square-400.jpg",
-        "artistKey": "r85827",
-        "canDownload": false,
-        "length": 1,
-        "canTether": true,
-        "albumKey": "a997001"
-      }
-    ]
-  }
-]
-
 
 var cities = [
     {

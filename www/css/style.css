@@ -11,16 +11,6 @@
   background-color: rgb(218,223,225);
 }
 
-.bar.bar-transparent {
-  background-color: transparent;
-  background-image: none;
-  border: none;
-}
-
-.bar .title {
-  color: #eee;
-}
-
 .swipe-cards {
   position: fixed;
 }
@@ -30,7 +20,7 @@ swipe-card {
   position: fixed;
   -webkit-transform: scale(1,1);
   left: 50%;
-  top: 45%;
+  top: 35%;
   width: 300px;
   height:500x;
   margin-left: -150px;
@@ -58,22 +48,6 @@ swipe-card .button {
 swipe-card .image img {
   width: 100%;
   border-radius: 0px 0px 4px 4px;
-}
-
-#start-card {
-  color: #fff;
-  background-color: #30BD8A;
-  line-height: 300px;
-  word-wrap: break-word;
-  border: 6px solid #4CD68E;
-  text-align: center;
-}
-#start-card span {
-  display: inline-block;
-  line-height: 40px;
-  width: 200px;
-  font-size: 30px;
-  vertical-align: middle;
 }
 
 #footer .button {
