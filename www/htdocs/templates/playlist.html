@@ -1,0 +1,30 @@
+<ion-view view-title="{{cityName(playlistId)}}'s Playlist">
+
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <br ng-show="loading" />
+    <three-bounce-spinner ng-show="loading"></three-bounce-spinner>
+    <swipe-cards ng-init="loadCards(playlistId);" ng-show="!loading">
+        <swipe-card ng-repeat="card in cards" on-destroy="cardDestroyed($index)" on-card-swipe="cardSwiped($index)">
+            <div class="item item-avatar">
+                <img ng-src="{{card.result[0].icon}}">
+                <h2>{{card.result[0].name}}</h2>
+                <p>{{card.result[0].artist}}</p>
+            </div>
+
+            <div class="item item-image">
+                <img ng-src="{{card.result[0].icon400}}">
+            </div>
+
+            <a ng-click="toggle()" class="item item-icon-left assertive" href="#">
+                <i class="icon ion-music-note"></i> {{ notPaused ? "Pause" : "Play" }}
+            </a>
+
+        </swipe-card>
+    </swipe-cards>
+</ion-view>

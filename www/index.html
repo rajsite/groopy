@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title></title>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+        <title>Loading</title>
+        <script type="text/javascript" src="cordova.js"></script>
+    </head>
+    <body onload="onLoad()">
+    <script>
+    var httpd = null;
+    function onLoad() {
+    	document.addEventListener("deviceready", onDeviceReady, false);
+    }
+    function onDeviceReady() {
+		console.log('ondeviceready');
+        httpd = ( cordova && cordova.plugins && cordova.plugins.CorHttpd ) ? cordova.plugins.CorHttpd : null;
 
-    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="lib/angular-spinkit/build/angular-spinkit.min.css">
+        startServer("htdocs");
+    }
 
-    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
+    function startServer( wwwroot ) {
+		console.log('startServer');
+    	if ( httpd ) {
+    	    httpd.getURL(function(url){
+    	    	if(url.length > 0) {
+    	    		window.location = 'http://localhost:8080/';
+	    	    } else {
+    	    	    httpd.startServer({
+    	    	    	'www_root' : wwwroot,
+    	    	    	'port' : 8080
+    	    	    }, function( url ){
+                        window.location = 'http://localhost:8080/';
+    	    	    }, function( error ){
+    	    	    	alert('cannot start server');
+    	    	    });
+    	    	}
+    	    	
+    	    },function(){});
+    	} else {
+    		alert('CorHttpd plugin not available/ready.');
+    	}
+    }
+    </script>
 
-    <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-    <script src="lib/angular-spinkit/build/angular-spinkit.min.js"></script>
-    <script src="lib/ionic/js/ionic.swipecards.js"></script>
-
-    <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
-
-    <!-- your app's js -->
-    <script src="js/app.js"></script>
-    <script src="js/controllers.js"></script>
-  </head>
-
-  <body ng-app="starter">
-    <ion-nav-view></ion-nav-view>
-  </body>
+    
+    </body>
 </html>
