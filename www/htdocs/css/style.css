@@ -20,7 +20,7 @@ swipe-card {
   position: fixed;
   -webkit-transform: scale(1,1);
   left: 50%;
-  top: 45%;
+  top: 35%;
   width: 300px;
   height:500x;
   margin-left: -150px;

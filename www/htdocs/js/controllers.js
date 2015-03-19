@@ -56,11 +56,6 @@ module.controller('PlaylistsCtrl', function ($scope, $location) {
             $scope.sortLocations($scope.cities, position.coords.latitude, position.coords.longitude);
             $scope.loading = false;
             $scope.$digest();
-
-            setTimeout(function () {
-                var path = 'app/playlists/' + $scope.cities[0].rank;
-                $location.path(path);
-            }, 200);
         });
     };
 
